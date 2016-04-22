@@ -2,25 +2,44 @@ import ReactDOM from 'react-dom';
 import React from 'react'
 import Rx from 'rx'
 
+const Image = React.createClass({
+    getInitialState() {
+	return { checked:false }
+    },
+    exit(evt) {
+	console.log("exiting");
+	this.setState({checked:false});
+
+    },
+    enter(evt) {
+	console.log("entering");
+	this.setState({checked:true});
+    },
+    render() {
+	return (<div onMouseLeave={this.exit} onMouseEnter={this.enter}  className="col s12" style={{animation: "4s slidein", position:"relative",margin:"10px 10px 10px 10px"}}  >
+		
+		<img  src={this.props.src} className="materialboxed" width="100%" ></img>
+		<span style={{ opacity: "0.5", position: "absolute", top: "15px", left: "25px", display: (_ => { if(this.state.checked) return "block"; return "none"} )()}}><img src="public/images.png" width="30px"  /></span>
+		<span><div className="center-align">caption</div></span>
+		</div>
+	       );
+    }
+})
+
 const ImageCol = React.createClass({
+    getInitialState() {
+	return {checked:false}
+    },
     componentDidUpdate() {
 	$('.materialboxed').materialbox();
     },
+    
     render() {
-	return ( <div className={"col s" + this.props.width} style={{ height: "100%"}} id={this.props.id}>
+	return ( <div className={"col s" + this.props.width} style={{ height: "100%"}} id={this.props.id} >
 		 <div className="row">
 		 {( _ => {
 		     return this.props.images.map(d => {
-			 return ( <div className="col s12" style={{animation: "4s slidein"}} key={d}>
-				  <div className="card">
-				  <div className="card-image">
-				  <img src={d} className="materialboxed"></img>
-				  </div>
-				  <div className="card-content">
-				  </div>
-				  </div>
-				  </div>
-				);
+			 return ( <Image src={d} key={d}/>);
 		     });
 		 })()}
 		 </div>
@@ -38,8 +57,10 @@ const Main = React.createClass({
 	    let contentHeight = Math.max( $('#imageCol0 > div').height(), $('#imageCol1 > div').height(), $('#imageCol2 > div').height(),$('#imageCol3 > div').height());
 	    let distFromBottom = window.scrollY + window.innerHeight - contentHeight;
 	    
-	    if(distFromBottom >= 0) {
+	    if(distFromBottom >= -50) {
 		console.log("bottom of panel %s", distFromBottom);
+
+		// 80 is the total number of images
 		if(this.state.end < 80) {
 		    this.setState({ end: this.state.end + 10});
 		    this.getImages();
